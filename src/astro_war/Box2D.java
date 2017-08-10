@@ -6,6 +6,7 @@ public class Box2D {
 	protected int x;
 	protected int y;
 	
+	/*  충돌 체크  */
 	public boolean crashCheck(int x, int y, int width, int height) {
 		if(this.x - width <= x && this.x + this.width >= x) {
 			if(this.y <= y && this.y + this.height >= y) {

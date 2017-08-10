@@ -1,5 +1,6 @@
 package astro_war;
 
+/* Æø¹ß ÀÌÆåÆ® ÀÌ¹ÌÁö °´Ã¼ */
 public class Explosion {
 	private boolean anim_flag = false;
 	private boolean destroy = false;

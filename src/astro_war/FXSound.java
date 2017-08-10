@@ -13,6 +13,7 @@ public class FXSound {
 	private Media main;
 	private Media game;
 	
+	/* 첫 생성시 사운드 리소스 로딩 */
 	public FXSound() {
 		System.out.println("[Init Game Resource]");
 		try {
@@ -25,6 +26,7 @@ public class FXSound {
 			effect_map.put("explosion", new AudioClip(AstroWar.class.getResource("explosion.mp3").toString()));
 			effect_map.put("shoot", new AudioClip(AstroWar.class.getResource("shoot.mp3").toString()));
 			effect_map.put("hit", new AudioClip(AstroWar.class.getResource("hit_player.mp3").toString()));
+			effect_map.put("crash", new AudioClip(AstroWar.class.getResource("crash.mp3").toString()));
 			System.out.println("Done!");
 		} catch (Exception e) {
 			System.out.println("Error!");

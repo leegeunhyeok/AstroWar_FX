@@ -1,5 +1,6 @@
 package astro_war;
 
+/* 운석 레이저 객체 */
 public class MeteoLaser extends Box2D {
 	private int SPEED = 8;
 	private double x_, y_;

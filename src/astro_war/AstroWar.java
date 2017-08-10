@@ -1,5 +1,12 @@
 package astro_war;
 
+/*
+ * Developer : 이근혁
+ * E-Mail : lghlove0509 @ naver.com
+ * AstroWar FX Edition
+ * 
+ * */
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,7 +27,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class AstroWar extends Application {
-	private final String VERSION = "1.01";
+	/* -----게임내 고정값----- */
+	private final String VERSION = "1.02";
 	private final int btn_width = 200;
 	private final int btn_height = 75;
 	private final int btn_x = 30;
@@ -28,9 +36,13 @@ public class AstroWar extends Application {
 	private final int shop_btn_y = 550;
 	private final int exit_btn_y = 650;
 	private final int laser_speed = 9;
-	private int player_width;
+	/*---------------------*/
+	
+	private int player_width; //플레이어 스킨별 폭(px) 저장 변수
+	
 	private Timeline gameLoop = new Timeline();
 
+	/*----- 게임 내 사용하는 이미지 리소스 -----*/
 	private Image mainBackground = new Image("images/main_background.png");
 	private Image bg = new Image("images/background.png");
 
@@ -68,32 +80,36 @@ public class AstroWar extends Application {
 	private Image shop_right_image = new Image("images/right.png");
 	private Image shop_buy_image = new Image("images/button_buy.png");
 	private Image shop_already_own = new Image("images/already_own.png");
+	/*---------------------*/
 
+	
+	/*----- 동적으로 생성되고 삭제되는 게임 오브젝트 관리 -----*/
 	private ArrayList<Meteorite> meteo_list = new ArrayList<>();
 	private ArrayList<MeteoLaser> mLaser_list = new ArrayList<>();
 	private ArrayList<Explosion> Explosion_list = new ArrayList<>();
 	private ArrayList<Laser> laser_list = new ArrayList<>();
 	private ArrayList<Item> item_list = new ArrayList<>();
 	private ArrayList<String> input = new ArrayList<>();
+	/*---------------------*/
 
-	private FXSound sound = new FXSound();
-	private FileManager file_mgr = new FileManager();
-	private PlayerSkin skin_mgr = new PlayerSkin();
+	private FXSound sound = new FXSound(); //소리 출력 
+	private FileManager file_mgr = new FileManager(); //파일 입출력 
+	private PlayerSkin skin_mgr = new PlayerSkin(); //플레이어 스킨
 
 	private int[] unlock_state = new int[5];
-	private int G_SCORE;
-	private int G_COIN;
-	private int player_skin_number = 0;
-	private int player_x, player_y;
-	private int player_life;
-	private int player_speed;
-	private int player_shoot_speed;
-	private int player_damage;
-	private int laser_count;
-	private int meteo_time_speed;
-	private int bg1, bg2, bg_refresh;
-	private int meteo_spawn, meteo_anim_cnt;
-	private int laser_delay;
+	private int G_SCORE; //게임 내 점수
+	private int G_COIN; //코인
+	private int player_skin_number = 0; //현재 플레이어 스킨 번호 (0~4)
+	private int player_x, player_y; //플레이어 좌표 x, y
+	private int player_life; //플레이어 체력
+	private int player_speed; //플레이어 이동속도
+	private int player_shoot_speed; //플레이어 발사 속도
+	private int player_damage; //플레이어 레이저 데미지
+	private int laser_count; //현재 발사하는 레이저 수 (초기: 1)
+	private int meteo_time_speed; 
+	private int bg1, bg2, bg_refresh; //배경 움직이는 작업을 위한 변수
+	private int meteo_spawn, meteo_anim_cnt; 
+	private int laser_delay; 
 	private int TIME_SCORE_CNT = 0;
 	private int shield_time = 0;
 	private int slow_time = 0;
@@ -102,6 +118,7 @@ public class AstroWar extends Application {
 	private int destroy_meteo_count = 0;
 	private int get_item_count = 0;
 	private int shop_show_number;
+	
 	private boolean inGame = false;
 	private boolean pause = false;
 	private boolean shop = false;
@@ -118,12 +135,14 @@ public class AstroWar extends Application {
 	/* 시작 */
 	@Override
 	public void start(Stage theStage) {
+		/* 아이템 이미지 로딩 */
 		Item_list[0] = new Image("images/life_up_item.png");
 		Item_list[1] = new Image("images/damage_up_item.png");
 		Item_list[2] = new Image("images/slow_item.png");
 		Item_list[3] = new Image("images/shield_item.png");
 		Item_list[4] = new Image("images/laser_count_up_item.png");
-		file_mgr.loadData();
+		
+		file_mgr.loadData(); //데이터 불러오기
 		unlock_state = file_mgr.getUnlockState();
 		for (int i = 0; i < 5; i++)
 			G_COIN = file_mgr.getCoin();
@@ -210,8 +229,8 @@ public class AstroWar extends Application {
 		theScene.setOnMouseReleased(e -> {
 			int x = (int) e.getX();
 			int y = (int) e.getY();
-			if (inGame) {
-				if (pause) {
+			if (inGame) { //인게임
+				if (pause) { //일시정지
 					if (resume_clicked && x >= 200 && x <= 400 && y >= 225 && y <= 300) {
 						resume_clicked = false;
 						pause = false;
@@ -224,16 +243,17 @@ public class AstroWar extends Application {
 						resume_clicked = false;
 						main_clicked = false;
 					}
-				} else if (gameOver) {
+				} else if (gameOver) { //게임 종료
 					if (x >= 200 && x <= 400 && y >= 700 && y <= 775) {
 						inGame = false;
 						mainInit();
 					}
 				}
 			} else {
-				if (!shop) {
+				if (!shop) { //상점이 아닐 때 (메인화면)
 					if (x >= btn_x && x <= btn_width + btn_x && y >= start_btn_y && y <= btn_height + start_btn_y
 							&& start_clicked) {
+						//게임 시작
 						System.out.println("INFO: start game");
 						sound.BGMstop("main");
 						start_clicked = false;
@@ -241,12 +261,15 @@ public class AstroWar extends Application {
 						inGame = true;
 					} else if (x >= btn_x && x <= btn_width + btn_x && y >= shop_btn_y && y <= btn_height + shop_btn_y
 							&& shop_clicked) {
+						//상점 진입
 						System.out.println("INFO: shop");
 						shop = true;
 					} else if (x >= btn_x && x <= btn_width + btn_x && y >= exit_btn_y && y <= btn_height + exit_btn_y
 							&& exit_clicked) {
+						//게임 종료
 						Platform.exit();
 					} else if (x >= 525 && x <= 575 && y >= 730 && y <= 780) {
+						// 팝업창
 						if (popup.isShowing()) {
 							popup.hide();
 						} else {
@@ -258,14 +281,17 @@ public class AstroWar extends Application {
 					start_clicked = false;
 					shop_clicked = false;
 					exit_clicked = false;
-				} else {
+				} else { //상점
 					if (x >= 20 && x <= 70 && y >= 375 && y <= 425) {
+						//이전 스킨 버튼
 						if (shop_show_number > 0)
 							shop_show_number--;
 					} else if (x >= 530 && x <= 580 && y >= 375 && y <= 425) {
+						//다음 스킨 버튼
 						if (shop_show_number < 4)
 							shop_show_number++;
 					} else if (x >= 250 && x <= 350 && y >= 520 && y <= 555) {
+						//구매하기 버튼
 						if (unlock_state[shop_show_number] == 0) {
 							if (G_COIN >= skin_mgr.getPrice(shop_show_number)) {
 								System.out.println(
@@ -276,6 +302,7 @@ public class AstroWar extends Application {
 							}
 						}
 					} else if (x >= 200 && x <= 400 && y >= 700 && y <= 775) {
+						//메인화면으로 돌아가기
 						if (unlock_state[shop_show_number] == 1)
 							player_skin_number = shop_show_number;
 						else
@@ -542,8 +569,7 @@ public class AstroWar extends Application {
 					System.out.println("(Shield skill : Score +40)");
 					G_SCORE += 40;
 				}
-				sound.EffectPlay("explosion");
-				Explosion_list.add(new Explosion(m.x, m.y));
+				sound.EffectPlay("crash");
 				meteo_list.remove(m);
 				m = null;
 			}
@@ -793,7 +819,7 @@ public class AstroWar extends Application {
 		player_x = 275;
 		player_y = 600;
 		laser_count = 1;
-		meteo_hp = 30;
+		meteo_hp = 16;
 		hit_delay = 0;
 		pause = false;
 		shield = false;

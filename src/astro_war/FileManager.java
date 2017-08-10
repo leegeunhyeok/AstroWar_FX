@@ -15,6 +15,7 @@ public class FileManager {
 	private int coin;
 	private int skin_number;
 
+	/* 데이터 불러오기 */
 	public void loadData() {
 		try {
 			System.out.print("File loading.. ");
@@ -29,6 +30,7 @@ public class FileManager {
 			}
 			System.out.println("Done!");
 		} catch (FileNotFoundException e) {
+			// 파일이 없으면 새로 생성
 			try {
 				System.out.print("File Not Found!\nNew file Creating.. ");
 				FileWriter newfile = new FileWriter(new File("player.asw"));
@@ -57,6 +59,8 @@ public class FileManager {
 		}
 	}
 
+	
+	/* 데이터 저장하기 */
 	public void saveData(int _coin, int skin_number, int[] unlock) {
 		try {
 			System.out.print("File saving.. ");

@@ -1,5 +1,6 @@
 package astro_war;
 
+/* 레이저 객체 */
 public class Laser {
 	private int laser_X;
 	private int laser_Y;

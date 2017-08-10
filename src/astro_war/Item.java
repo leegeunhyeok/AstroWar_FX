@@ -1,5 +1,6 @@
 package astro_war;
 
+/* æ∆¿Ã≈€ ∞¥√º */
 public class Item extends Box2D {
 	private int type;
 	

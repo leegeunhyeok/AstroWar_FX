@@ -43,7 +43,7 @@
                                     <Image url="@../images/default_player.png" />
                                  </image>
                               </ImageView>
-                              <Text fill="WHITE" layoutX="14.0" layoutY="152.0" strokeType="OUTSIDE" strokeWidth="0.0" text="버전: AstroWar FX Edition 1.01 Release">
+                              <Text fill="WHITE" layoutX="14.0" layoutY="152.0" strokeType="OUTSIDE" strokeWidth="0.0" text="버전: AstroWar FX Edition 1.02 Release">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
