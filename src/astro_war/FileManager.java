@@ -30,7 +30,7 @@ public class FileManager {
 			System.out.println("Done!");
 		} catch (FileNotFoundException e) {
 			try {
-				System.out.print("File Not Found!\n New file Creating.. ");
+				System.out.print("File Not Found!\nNew file Creating.. ");
 				FileWriter newfile = new FileWriter(new File("player.asw"));
 				String s = "0\r\n0\r\n0\r\n0\r\n0\r\n0\r\n0";
 				newfile.write(s);

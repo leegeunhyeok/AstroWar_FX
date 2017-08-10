@@ -43,7 +43,7 @@
                                     <Image url="@../images/default_player.png" />
                                  </image>
                               </ImageView>
-                              <Text fill="WHITE" layoutX="14.0" layoutY="152.0" strokeType="OUTSIDE" strokeWidth="0.0" text="버전: AstroWar FX Edition 1.0 Release">
+                              <Text fill="WHITE" layoutX="14.0" layoutY="152.0" strokeType="OUTSIDE" strokeWidth="0.0" text="버전: AstroWar FX Edition 1.01 Release">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
@@ -67,7 +67,7 @@
                         <Pane layoutX="15.0" layoutY="11.0" prefHeight="250.0" prefWidth="320.0" style="-fx-background-color: lightskyblue; -fx-background-radius: 30px;">
                            <children>
                               <Text layoutX="14.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 위에서 내려오는 운석을 맞추는 슈팅게임입니다." />
-                              <Text layoutX="14.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 시간이 지날수록 운석의 HP가 증가합니다." />
+                              <Text layoutX="14.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 시간이 지날수록 운석의 HP, 속도가 증가합니다." />
                               <Text layoutX="14.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 운석을 부수면 일정 확률로 아이템이 드랍됩니다." />
                               <Text layoutX="14.0" layoutY="116.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 게임이 종료되면 점수에 따라 코인이 지급됩니다." />
                               <Text layoutX="14.0" layoutY="146.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 상점에서 플레이어 스킨을 구매할 수 있습니다." />
@@ -78,8 +78,8 @@
                                  </font>
                               </Text>
                               <Text fill="WHITE" layoutX="25.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="이동: W, A, S, D / 일시정지 메뉴 : ESC" />
-                              <Text layoutX="14.0" layoutY="178.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 기본점수 : 레이저 갯수 * 10, 아이템 먹으면 +5" />
-                              <Text layoutX="25.0" layoutY="193.0" strokeType="OUTSIDE" strokeWidth="0.0" text="방어막있는 상태로  운석과 충돌시 +20점" />
+                              <Text layoutX="14.0" layoutY="178.0" strokeType="OUTSIDE" strokeWidth="0.0" text="- 기본점수 : 레이저 갯수 * 20, 아이템 먹으면 +10" />
+                              <Text layoutX="25.0" layoutY="193.0" strokeType="OUTSIDE" strokeWidth="0.0" text="방어막있는 상태로  운석과 충돌시 +40점" />
                            </children>
                         </Pane>
                      </children>

@@ -6,11 +6,11 @@ public class Box2D {
 	protected int x;
 	protected int y;
 	
-	public boolean crashCheck(int x, int y, int width) {
+	public boolean crashCheck(int x, int y, int width, int height) {
 		if(this.x - width <= x && this.x + this.width >= x) {
-			//System.out.println("x crash");
-			if(this.y <= y && this.y + height >= y) {
-				//System.out.println("y crash");
+			if(this.y <= y && this.y + this.height >= y) {
+				return true;
+			} else if( y <= this.y && y + height >= this.y) {
 				return true;
 			}
 		}

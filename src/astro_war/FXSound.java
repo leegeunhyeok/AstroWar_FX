@@ -14,15 +14,17 @@ public class FXSound {
 	private Media game;
 	
 	public FXSound() {
+		System.out.println("[Init Game Resource]");
 		try {
 			System.out.print("Sound Loading.. ");
-			main = new Media(AstroWar.class.getResource("../sounds/main.mp3").toString());
-			game = new Media(AstroWar.class.getResource("../sounds/game_bgm.mp3").toString());
+			main = new Media(AstroWar.class.getResource("main.mp3").toString());
+			game = new Media(AstroWar.class.getResource("game_bgm.mp3").toString());
 			bgm_map.put("main", new MediaPlayer(main));
 			bgm_map.put("game", new MediaPlayer(game));
-			effect_map.put("item", new AudioClip(AstroWar.class.getResource("../sounds/item.mp3").toString()));
-			effect_map.put("explosion", new AudioClip(AstroWar.class.getResource("../sounds/explosion.mp3").toString()));
-			effect_map.put("shoot", new AudioClip(AstroWar.class.getResource("../sounds/shoot.mp3").toString()));
+			effect_map.put("item", new AudioClip(AstroWar.class.getResource("item.mp3").toString()));
+			effect_map.put("explosion", new AudioClip(AstroWar.class.getResource("explosion.mp3").toString()));
+			effect_map.put("shoot", new AudioClip(AstroWar.class.getResource("shoot.mp3").toString()));
+			effect_map.put("hit", new AudioClip(AstroWar.class.getResource("hit_player.mp3").toString()));
 			System.out.println("Done!");
 		} catch (Exception e) {
 			System.out.println("Error!");

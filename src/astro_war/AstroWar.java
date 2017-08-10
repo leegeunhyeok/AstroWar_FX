@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class AstroWar extends Application {
-	private final String VERSION = "1.0";
+	private final String VERSION = "1.01";
 	private final int btn_width = 200;
 	private final int btn_height = 75;
 	private final int btn_x = 30;
@@ -61,6 +61,7 @@ public class AstroWar extends Application {
 
 	private Image Shield = new Image("images/shield.png");
 	private Image Heart = new Image("images/life_heart.png");
+	private Image MeteoLaser = new Image("images/meteo_laser.png");
 	private Image[] Item_list = new Image[5];
 
 	private Image shop_left_image = new Image("images/left.png");
@@ -69,6 +70,7 @@ public class AstroWar extends Application {
 	private Image shop_already_own = new Image("images/already_own.png");
 
 	private ArrayList<Meteorite> meteo_list = new ArrayList<>();
+	private ArrayList<MeteoLaser> mLaser_list = new ArrayList<>();
 	private ArrayList<Explosion> Explosion_list = new ArrayList<>();
 	private ArrayList<Laser> laser_list = new ArrayList<>();
 	private ArrayList<Item> item_list = new ArrayList<>();
@@ -88,6 +90,7 @@ public class AstroWar extends Application {
 	private int player_shoot_speed;
 	private int player_damage;
 	private int laser_count;
+	private int meteo_time_speed;
 	private int bg1, bg2, bg_refresh;
 	private int meteo_spawn, meteo_anim_cnt;
 	private int laser_delay;
@@ -95,6 +98,7 @@ public class AstroWar extends Application {
 	private int shield_time = 0;
 	private int slow_time = 0;
 	private int meteo_hp;
+	private int hit_delay;
 	private int destroy_meteo_count = 0;
 	private int get_item_count = 0;
 	private int shop_show_number;
@@ -124,8 +128,8 @@ public class AstroWar extends Application {
 		for (int i = 0; i < 5; i++)
 			G_COIN = file_mgr.getCoin();
 		player_skin_number = file_mgr.getSkinNum();
-		
-		theStage.setTitle("AstroWar FX Edition" + VERSION);
+
+		theStage.setTitle("AstroWar FX Edition " + VERSION);
 
 		Group root = new Group();
 		Scene theScene = new Scene(root);
@@ -146,7 +150,12 @@ public class AstroWar extends Application {
 			String code = e.getCode().toString();
 			if (code.equals("ESCAPE")) {
 				if (inGame)
-					pause = !pause;
+					if (pause) {
+						System.out.println("INFO: Resume");
+					} else {
+						System.out.println("INFO: Pause");
+					}
+				pause = !pause;
 				return;
 			}
 
@@ -160,7 +169,6 @@ public class AstroWar extends Application {
 		});
 		/*--------------*/
 
-		
 		/* 마우스 이벤트 처리 */
 		theScene.setOnMousePressed(e -> {
 			int x = (int) e.getX();
@@ -226,12 +234,14 @@ public class AstroWar extends Application {
 				if (!shop) {
 					if (x >= btn_x && x <= btn_width + btn_x && y >= start_btn_y && y <= btn_height + start_btn_y
 							&& start_clicked) {
+						System.out.println("INFO: start game");
 						sound.BGMstop("main");
 						start_clicked = false;
 						gameInit();
 						inGame = true;
 					} else if (x >= btn_x && x <= btn_width + btn_x && y >= shop_btn_y && y <= btn_height + shop_btn_y
 							&& shop_clicked) {
+						System.out.println("INFO: shop");
 						shop = true;
 					} else if (x >= btn_x && x <= btn_width + btn_x && y >= exit_btn_y && y <= btn_height + exit_btn_y
 							&& exit_clicked) {
@@ -258,22 +268,26 @@ public class AstroWar extends Application {
 					} else if (x >= 250 && x <= 350 && y >= 520 && y <= 555) {
 						if (unlock_state[shop_show_number] == 0) {
 							if (G_COIN >= skin_mgr.getPrice(shop_show_number)) {
+								System.out.println(
+										"INFO: Buy player skin (Price: " + skin_mgr.getPrice(shop_show_number) + ")");
 								G_COIN = G_COIN - skin_mgr.getPrice(shop_show_number);
 								unlock_state[shop_show_number] = 1;
 								file_mgr.saveData(G_COIN, player_skin_number, unlock_state);
 							}
 						}
 					} else if (x >= 200 && x <= 400 && y >= 700 && y <= 775) {
-						if(unlock_state[shop_show_number]==1) player_skin_number = shop_show_number;
-						else player_skin_number = 0;
+						if (unlock_state[shop_show_number] == 1)
+							player_skin_number = shop_show_number;
+						else
+							player_skin_number = 0;
+						System.out.println("INFO: Choose skin: " + player_skin_number);
 						shop = false;
 					}
 				}
 			}
 		});
 		/*--------------*/
-		
-		
+
 		gameLoop.setCycleCount(Timeline.INDEFINITE);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -284,7 +298,7 @@ public class AstroWar extends Application {
 			ScreenDraw(gc);
 		});
 		/*--------------*/
-		
+
 		gameLoop.getKeyFrames().add(kf);
 		gameLoop.play();
 		mainInit();
@@ -294,7 +308,6 @@ public class AstroWar extends Application {
 		theStage.show();
 	}
 
-	
 	/* 메인화면, 상점 그리기 */
 	public void ScreenDraw(GraphicsContext g) {
 		g.clearRect(0, 0, 600, 800); // 화면 지우기 //
@@ -363,6 +376,10 @@ public class AstroWar extends Application {
 		TIME_SCORE_CNT++;
 		shield_time--;
 		slow_time--;
+		
+		if(hit_delay>0) {
+			hit_delay--;
+		}
 
 		if (shield_time <= 0) {
 			shield = false;
@@ -417,6 +434,24 @@ public class AstroWar extends Application {
 			if (pos.getLaserY() <= -30)
 				laser_list.remove(pos);
 		}
+		
+		for (int i = 0; i < mLaser_list.size(); i++) {
+			MeteoLaser mLaser = mLaser_list.get(i);
+			mLaser.setMove();
+			if(mLaser.getX()>=600 || mLaser.getX()<= -20 || mLaser.getY()>=800) {
+				mLaser_list.remove(mLaser);
+				continue;
+			}
+			
+			if (mLaser.crashCheck(player_x, player_y, player_width, 40) && hit_delay == 0) {
+				if(!shield) {
+					hit_delay = 30;
+					player_life--;
+				}
+				mLaser_list.remove(mLaser);
+				sound.EffectPlay("hit");
+			}
+		}
 
 		/* 폭발 이펙트 관리 */
 		for (int i = 0; i < Explosion_list.size(); i++) {
@@ -430,41 +465,52 @@ public class AstroWar extends Application {
 		/* 아이템 제어 */
 		for (int i = 0; i < item_list.size(); i++) {
 			Item temp = item_list.get(i);
-			if (temp.crashCheck(player_x, player_y, player_width)) {
+			if (temp.crashCheck(player_x, player_y, player_width, 60)) {
 				switch (temp.getType()) {
 				case 0:
-					if (player_life < 10)
+					if (player_life < 10) {
 						player_life++;
+						System.out.println("INFO: Life +1");
+					}
 					break;
 
 				case 1:
-					player_damage += 10;
 					if (player_skin_number == 4) {
+						System.out.println("INFO: Damage +10*2");
+						player_damage += 20;
+					} else {
+						System.out.println("INFO: Damage +10");
 						player_damage += 10;
 					}
 					break;
 
 				case 2:
+					System.out.println("INFO: Meteo speed down");
 					slow = true;
 					slow_time = 400;
 					break;
 
 				case 3:
+					System.out.println("INFO: Shield ON");
 					shield = true;
 					shield_time = 300;
 					break;
 
 				case 4:
 					if (player_skin_number == 4) {
-						if (laser_count < 5)
+						if (laser_count < 5) {
+							System.out.println("INFO: Laser count +1");
 							laser_count++;
-					} else if (laser_count < 3)
+						}
+					} else if (laser_count < 3) {
+						System.out.println("INFO: Laser count +1");
 						laser_count++;
+					}
 					break;
 				}
 				item_list.remove(temp);
 				get_item_count++;
-				G_SCORE += 5;
+				G_SCORE += 10;
 				sound.EffectPlay("item");
 			}
 		}
@@ -472,32 +518,29 @@ public class AstroWar extends Application {
 		/* 운석 제어(플레이어와 충돌, 레이저와 충돌) */
 		for (int i = 0; i < meteo_list.size(); i++) {
 			Meteorite m = meteo_list.get(i);
+
+			if (m.shootPermission()) {
+				mLaser_list.add(new MeteoLaser(player_x + (player_width / 2), player_y + 40, m.x + 40, m.y + 50));
+			}
+
 			if (slow) {
 				m.MoveDown(2);
 			} else
-				m.MoveDown(0);
+				m.MoveDown(meteo_time_speed);
 
 			if (m.y >= 800) {
 				meteo_list.remove(m);
 			}
 
-			if (m.crashCheck(player_x, player_y, player_width)) {
-				if (!shield) {
+			if (m.crashCheck(player_x, player_y, player_width, 60)) {
+				System.out.print("INFO: Crash ");
+				if (!shield && hit_delay == 0) {
+					hit_delay = 30;
+					System.out.println("(Life -1)");
 					player_life--;
 				} else {
-					G_SCORE += 20;
-				}
-				
-				if (player_life <= 0) {
-					int temp_coin = G_SCORE + destroy_meteo_count + get_item_count;
-					if (player_skin_number == 2) {
-						file_mgr.saveData(G_COIN + temp_coin + (temp_coin * 20) / 100, player_skin_number,
-								unlock_state);
-					} else {
-						file_mgr.saveData(G_COIN + temp_coin, player_skin_number, unlock_state);
-					}
-					G_COIN = file_mgr.getCoin();
-					gameOver = true;
+					System.out.println("(Shield skill : Score +40)");
+					G_SCORE += 40;
 				}
 				sound.EffectPlay("explosion");
 				Explosion_list.add(new Explosion(m.x, m.y));
@@ -511,12 +554,13 @@ public class AstroWar extends Application {
 					break;
 				}
 
-				if (m.crashCheck(la.getLaserX(), la.getLaserY(), 0)) {
+				if (m.crashCheck(la.getLaserX(), la.getLaserY(), 3, 20)) {
 					m.attacked(la.getDamage());
 					laser_list.remove(la);
 					if (!(m.getLiveStatus())) {
 						int item = m.dropItem();
 						if (item != 0) {
+							System.out.println("INFO: " + item + " Item Drop");
 							item_list.add(new Item(item - 1, m.x + 30, m.y + 60));
 							// 아이템 갯수가 5개를 초과하면 오래된 아이템 1개 삭제//
 							if (item_list.size() > 5) {
@@ -525,17 +569,40 @@ public class AstroWar extends Application {
 						}
 						Explosion_list.add(new Explosion(m.x, m.y));
 						meteo_list.remove(m);
-						G_SCORE += 10 * laser_count;
+						G_SCORE += 20 * laser_count * -(meteo_time_speed - 1);
 						meteo_hp += 2;
+
+						if (G_SCORE >= 3000 && meteo_time_speed > -1) {
+							System.out.println("INFO: ## Meteo speed up ## (Default Score x2)");
+							meteo_time_speed--;
+						} else if (G_SCORE >= 7500 && meteo_time_speed > -2) {
+							System.out.println("INFO: ## Meteo speed up ## (Default Score x4)");
+							meteo_time_speed--;
+						}
+
 						destroy_meteo_count++;
 						sound.EffectPlay("explosion");
 					}
 				}
 			}
 		}
+
+		if (player_life <= 0) {
+			System.out.println("INFO: Game Over");
+			int temp_coin = G_SCORE + destroy_meteo_count + get_item_count;
+			System.out.print("INFO: Get Coin: " + temp_coin);
+			if (player_skin_number == 2) {
+				System.out.println(" + Skin Bonus: " + (temp_coin * 20) / 100);
+				file_mgr.saveData(G_COIN + temp_coin + (temp_coin * 20) / 100, player_skin_number, unlock_state);
+			} else {
+				System.out.println("");
+				file_mgr.saveData(G_COIN + temp_coin, player_skin_number, unlock_state);
+			}
+			G_COIN = file_mgr.getCoin();
+			gameOver = true;
+		}
 	}
 
-	
 	/* 메인화면 그리기 */
 	public void mainScreenDraw(GraphicsContext g) {
 		g.drawImage(Title, 50, 40);
@@ -559,7 +626,6 @@ public class AstroWar extends Application {
 		g.drawImage(button_help, 525, 730);
 	}
 
-	
 	/* 상점 그리기 */
 	public void shopDraw(GraphicsContext g) {
 		g.setFill(Color.YELLOW);
@@ -601,7 +667,6 @@ public class AstroWar extends Application {
 		g.drawImage(button_main, 200, 700);
 	}
 
-	
 	/* 게임내의 모든 데이터를 그리는 메소드 */
 	public void inGameDraw(GraphicsContext g) {
 		/* 운석 그리기 */
@@ -640,20 +705,24 @@ public class AstroWar extends Application {
 			g.drawImage(Laser, l.getLaserX(), l.getLaserY());
 		}
 
+		for (int i = 0; i < mLaser_list.size(); i++) {
+			MeteoLaser ml = mLaser_list.get(i);
+			g.drawImage(MeteoLaser, ml.getX(), ml.getY());
+		}
+
 		/* 플레이어 그리기 */
 		g.drawImage(Player_skin, player_x, player_y);
 		if (shield)
 			g.drawImage(Shield, player_x - (64 - player_width) / 2, player_y);
 	}
 
-	
 	/* 게임 내부 UI 그리기 */
 	public void inGameUIDraw(GraphicsContext g) {
 		/* 생명(하트) 그리기 */
 		for (int i = 0; i < player_life; i++) {
 			g.drawImage(Heart, 550 - (i * 30), 16);
 		}
-		
+
 		/* 점수, 공격력 그리기 */
 		g.setFont(new Font(30));
 		g.setStroke(Color.RED);
@@ -665,7 +734,6 @@ public class AstroWar extends Application {
 		g.fillText("공격력: " + player_damage, 24, 64);
 	}
 
-	
 	/* 일시정지 메뉴 그리기 */
 	public void pauseMenuDraw(GraphicsContext g) {
 		if (resume_clicked) {
@@ -703,7 +771,6 @@ public class AstroWar extends Application {
 		g.drawImage(button_main, 200, 700);
 	}
 
-	
 	/* 메인화면 진입 시 초기화(버튼 플래그 변수) */
 	public void mainInit() {
 		sound.BGMstop("game");
@@ -715,7 +782,6 @@ public class AstroWar extends Application {
 		sound.BGMPlay("main");
 	}
 
-	
 	/* 게임 시작 전 좌표, 점수등 초기화 */
 	public void gameInit() {
 		player_width = skin_mgr.getWidth(player_skin_number);
@@ -728,6 +794,7 @@ public class AstroWar extends Application {
 		player_y = 600;
 		laser_count = 1;
 		meteo_hp = 30;
+		hit_delay = 0;
 		pause = false;
 		shield = false;
 		slow = false;
@@ -735,11 +802,13 @@ public class AstroWar extends Application {
 		bg1 = 0;
 		bg2 = -800;
 		TIME_SCORE_CNT = 0;
+		meteo_time_speed = 0;
 		destroy_meteo_count = 0;
 		get_item_count = 0;
 		item_list.clear();
 		laser_list.clear();
 		meteo_list.clear();
+		mLaser_list.clear();
 		Explosion_list.clear();
 		G_SCORE = 0;
 		sound.BGMPlay("game");
